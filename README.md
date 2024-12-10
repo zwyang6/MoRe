@@ -5,7 +5,7 @@ We proposed MoRe to effectively tackle the artifact issue when generating Locali
 ## News
 
 * **If you find this work helpful, please give us a :star2: to receive the updation !**
-* **` Dec. 10th, 2024`:** MoRe is accepted.
+* **` Dec. 10th, 2024`:** MoRe is accepted by AAAI2025.
 * **Code will be available very soon** 🔥🔥🔥
 
 <!-- * **` Aug. 12th, 2024`:** We released our paper on Arxiv. Further details can be found in the updated [arXiv](http://arxiv.org/abs/2402.18467).
