@@ -6,7 +6,7 @@ We proposed MoRe to effectively tackle the artifact issue when generating Locali
 
 * **If you find this work helpful, please give us a :star2: to receive the updation !**
 * **` Dec. 10th, 2024`:** MoRe is accepted by AAAI2025.
-* **Code is available on VOC. We are sorting code for COCO ** 🔥🔥🔥
+* **Code is available on VOC. We are sorting code for COCO** 🔥🔥🔥
 
 ## Overview
 
