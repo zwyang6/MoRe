@@ -1,7 +1,7 @@
 import argparse
 import os
 import sys
-sys.path.append("./")
+sys.path.append(".")
 from collections import OrderedDict
 import imageio.v2 as imageio
 import matplotlib.pyplot as plt
