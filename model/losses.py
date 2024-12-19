@@ -221,7 +221,7 @@ class SRELoss_neg(nn.Module):
         patch_tokens =    F.normalize(patch_tokens, p=2, dim=1, eps=1e-8)
         cls_tokens_visual_ =  F.normalize(cls_tokens_visual_, p=2, dim=2, eps=1e-8)
         roi_mask = self.mask2roi(masks)
-        un_embeddings = self.crop_from_roi_neg(patch_tokens, roi_mask)
+        un_embeddings = self.uncertain_kernel_search(patch_tokens, roi_mask)
         cls_tokens_visual =  cls_tokens_visual_.detach()
         patch_tokens_cer = cls_tokens_visual
         total_loss = 0
@@ -238,7 +238,7 @@ class SRELoss_neg(nn.Module):
 
         return total_loss
 
-    def crop_from_roi_neg(self, patch_tokens, roi_mask=None, crop_num=8, kernel_size=6):
+    def uncertain_kernel_search(self, patch_tokens, roi_mask=None, crop_num=8, kernel_size=6):
 
         un_tokens = []
         b, c, h, w =  patch_tokens.shape
