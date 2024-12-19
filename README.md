@@ -1,4 +1,4 @@
-# [AAAI2025] MoRe: Class Patch Attention Needs Regularization for Weakly Supervised Semantic Segmentation [![arXiv](https://img.shields.io/badge/arXiv-2303.02506-b31b1b.svg)](https://arxiv.org/abs/2412.11076)
+# [AAAI2025] MoRe: Class Patch Attention Needs Regularization for Weakly Supervised Semantic Segmentation [![arXiv](https://img.shields.io/badge/arXiv-2303.02506-b31b1b.svg)](https://arxiv.org/pdf/2412.11076)
 
 We proposed MoRe to effectively tackle the artifact issue when generating Localization Attention Map (LAM) from class-patch attention in WSSS. 
 
