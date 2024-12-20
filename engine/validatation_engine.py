@@ -27,16 +27,14 @@ def build_validation(model=None, data_loader=None, args=None):
             cls, segs, _x4, cls_aux, attri_tokens_, score_maps,= model(inputs,)
             score_maps = torch.einsum('bchw,bkc->bkhw', _x4, attri_tokens_).clone().detach()
 
-            _cams, _cams_aux = multi_scale_cam2(model, inputs, args.cam_scales)
+            _cams, _ = multi_scale_cam2(model, inputs, args.cam_scales)
             resized_cam = F.interpolate(_cams, size=labels.shape[1:], mode='bilinear', align_corners=False)
             _, cam_label = cam_to_label(resized_cam, cls_label, bkg_thre=args.bkg_thre, high_thre=args.high_thre, low_thre=args.low_thre, ignore_index=args.ignore_index)
 
             # index_map = torch.argmax(resized_segs, dim=1).cpu().numpy().astype(np.int16)
-        
-            _, cam_label_pred = cam_to_label(resized_cam, cls_pred, bkg_thre=args.bkg_thre, high_thre=args.high_thre, low_thre=args.low_thre, ignore_index=args.ignore_index)
-
-            resized_cam_aux = F.interpolate(_cams_aux, size=labels.shape[1:], mode='bilinear', align_corners=False)
-            _, cam_label_aux = cam_to_label(resized_cam_aux, cls_label, bkg_thre=args.bkg_thre, high_thre=args.high_thre, low_thre=args.low_thre, ignore_index=args.ignore_index)
+            cls_pred = (cls>0).type(torch.int16)
+            _f1 = evaluate.multilabel_score(cls_label.cpu().numpy()[0], cls_pred.cpu().numpy()[0])
+            avg_meter.add({"cls_score": _f1})
 
             resized_sm = F.interpolate(score_maps, size=labels.shape[1:], mode='bilinear', align_corners=False)
             resized_sm = norm_map_cam(resized_sm)
@@ -46,31 +44,23 @@ def build_validation(model=None, data_loader=None, args=None):
             fused_cam = norm_map_cam(fused_cam)
             _, f_label = cam_to_label(fused_cam, cls_label, bkg_thre=args.bkg_thre, high_thre=args.high_thre, low_thre=args.low_thre, ignore_index=args.ignore_index)
 
-            cls_pred = (cls > 0).type(torch.int16)
-            _f1 = evaluate.multilabel_score(cls_label.cpu().numpy()[0], cls_pred.cpu().numpy()[0])
-            avg_meter.add({"cls_score": _f1})
-
             resized_segs = F.interpolate(segs, size=labels.shape[1:], mode='bilinear', align_corners=False)
 
             preds += list(torch.argmax(resized_segs, dim=1).cpu().numpy().astype(np.int16))
             cams += list(cam_label.cpu().numpy().astype(np.int16))
             gts += list(labels.cpu().numpy().astype(np.int16))
-            cams_aux += list(cam_label_aux.cpu().numpy().astype(np.int16))
             sms += list(sm_label.cpu().numpy().astype(np.int16))
             fused += list(f_label.cpu().numpy().astype(np.int16))
-            seg_cam += list(cam_label_pred.cpu().numpy().astype(np.int16))
 
 
     cls_score = avg_meter.pop('cls_score')
     seg_score = evaluate.scores(gts, preds)
     cam_score = evaluate.scores(gts, cams)
-    cam_aux_score = evaluate.scores(gts, cams_aux)
     sms_score = evaluate.scores(gts, sms)
     f_score = evaluate.scores(gts, fused)
-    seg_cam_score = evaluate.scores(gts, seg_cam)
 
     model.train()
 
-    tab_results = format_tabs([cam_score, cam_aux_score, sms_score, f_score, seg_score, seg_cam_score], name_list=["CAM", "aux_CAM", "Score Map", "Fused", "Seg_Pred","Seg_CAM"], cat_list=voc.class_list)
+    tab_results = format_tabs([cam_score, sms_score, f_score, seg_score], name_list=["CAM", "Score Map", "Fused", "Seg_Pred"], cat_list=voc.class_list)
 
     return cls_score, tab_results
