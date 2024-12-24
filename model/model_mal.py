@@ -25,7 +25,7 @@ class network(nn.Module):
         
     def get_param_groups(self):
 
-        param_groups = [[], [], [], []] # backbone; backbone_norm; cls_head; seg_head;
+        param_groups = [[], [], [], [], []] # backbone; backbone_norm; cls_head; seg_head;
 
         for name, param in list(self.encoder.named_parameters()):
 
@@ -37,18 +37,20 @@ class network(nn.Module):
         param_groups[2].append(self.classifier.weight)
         param_groups[2].append(self.aux_classifier.weight)
 
-        for param in list(self.decoder.parameters()):
+        for param in list(self.graph_layer.parameters()):
             param_groups[3].append(param)
 
-        return param_groups
+        for param in list(self.decoder.parameters()):
+            param_groups[4].append(param)
 
+        return param_groups
 
     def to_2D(self, x, h, w):
         n, hw, c = x.shape
         x = x.transpose(1, 2).reshape(n, c, h, w)
         return x
 
-    def forward(self, x, cam_only=False, with_gcr=False):
+    def forward(self, x, cam_only=False, with_gcr=True):
 
         mctokens, _x, x_aux, score_maps = self.encoder.forward_features(x)
 
@@ -71,8 +73,7 @@ class network(nn.Module):
         cls_aux = cls_aux.view(-1, self.num_classes-1)
 
         seg = self.decoder(_x4)
-        if with_gcr:
-            mctokens = self.graph_layer(mctokens,_x)
+        mctokens = self.graph_layer(mctokens,_x) if with_gcr else mctokens
 
         score_maps_ = torch.sum(score_maps,dim=1)[:,:mctokens.shape[1],mctokens.shape[1]:]
         score_maps = score_maps_.reshape(score_maps.shape[0],mctokens.shape[1],h,w).detach()
