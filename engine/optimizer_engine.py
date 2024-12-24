@@ -24,6 +24,11 @@ def build_optimizer(args, param_groups):
                 "lr": args.lr * 10,
                 "weight_decay": args.wt_decay,
             },
+            {
+                "params": param_groups[4],
+                "lr": args.lr * 10,
+                "weight_decay": args.wt_decay,
+            },
         ],
         lr=args.lr,
         weight_decay=args.wt_decay,
