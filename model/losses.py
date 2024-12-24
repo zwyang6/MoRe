@@ -162,7 +162,7 @@ class DenseEnergyLossFunction(Function):
         return None, grad_segmentation, None, None, None, None
     
 
-class DRELoss_neg(nn.Module):
+class CRELoss_neg(nn.Module):
     def __init__(self, temp=1.0,):
         super().__init__()
         self.temp = temp
@@ -211,7 +211,7 @@ class DRELoss_neg(nn.Module):
         return flags_cer,flags_un
 
 ## token
-class SRELoss_neg(nn.Module):
+class URELoss_neg(nn.Module):
     def __init__(self, temp=1.0,):
         super().__init__()
         self.temp = temp
@@ -238,7 +238,7 @@ class SRELoss_neg(nn.Module):
 
         return total_loss
 
-    def uncertain_kernel_search(self, patch_tokens, roi_mask=None, crop_num=8, kernel_size=6):
+    def uncertain_kernel_search(self, patch_tokens, roi_mask=None, selected_num=8, kernel_size=6):
 
         un_tokens = []
         b, c, h, w =  patch_tokens.shape
@@ -256,14 +256,14 @@ class SRELoss_neg(nn.Module):
                     ## if ratio of uncertain regions < 0.2 then negative
                     roi_un_tokens.append(patch_tokens[i1,:, h0,w0])
 
-            if len(roi_un_tokens) > crop_num:
+            if len(roi_un_tokens) > selected_num:
                 rand_index = torch.randperm(len(roi_un_tokens))
                 roi_un_tokens = torch.stack(roi_un_tokens,dim=0)
-                roi_un_tokens_ = roi_un_tokens[rand_index[:crop_num]]
+                roi_un_tokens_ = roi_un_tokens[rand_index[:selected_num]]
 
             else:
-                # add_idx = crop_num - len(roi_un_tokens)
-                add_idx = (crop_num - len(roi_un_tokens)) // 4
+                # add_idx = selected_num - len(roi_un_tokens)
+                add_idx = (selected_num - len(roi_un_tokens)) // 4
                 pos_roi_index = (roi_mask[i1, margin:(h-margin), margin:(w-margin)] == 2).nonzero()
                 if pos_roi_index.shape[0] < add_idx:
                     pos_roi_index = (roi_mask[i1, margin:(h-margin), margin:(w-margin)] >= 0).nonzero() ## if NULL then random crop
