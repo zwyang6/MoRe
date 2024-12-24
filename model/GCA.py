@@ -40,7 +40,7 @@ class graphic_cls_aggregation(nn.Module):
     def forward(self, cls_tokens,feats, tok_ratio=0.5):
     # def forward(self, x):
         topk = int(tok_ratio * cls_tokens.shape[1])
-        x = torch.concat([cls_tokens,feats],dim=1)
+        x = torch.concat([cls_tokens,feats.clone().detach()],dim=1)
 
         e_h = self.W_head(cls_tokens)
         e_t = self.W_tail(x)
@@ -79,8 +79,8 @@ class graphic_cls_aggregation(nn.Module):
             embedding = torch.cat([e_h, e_Nh], dim=2)
             embedding = self.activation(self.linear(embedding))
         elif self.agg_type == 'bi-interaction':
-            sum_embedding = self.activation(self.linear1(cls_tokens + e_Nh))
-            bi_embedding = self.activation(self.linear2(cls_tokens * e_Nh))
+            sum_embedding = self.activation(self.linear1((e_h + e_Nh) * 0.1 + cls_tokens))
+            bi_embedding = self.activation(self.linear2(e_h * e_Nh * 0.1 + cls_tokens))
             embedding = sum_embedding + bi_embedding
         else:
             embedding = e_Nh
@@ -88,7 +88,7 @@ class graphic_cls_aggregation(nn.Module):
         h = self.message_dropout(embedding)
         h = self.norm(embedding)
     
-        return h + cls_tokens
+        return h
             
 if __name__ == "__main__":
     data = torch.randn((4, 784, 768)).cuda()
