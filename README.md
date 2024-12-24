@@ -81,7 +81,7 @@ bash run_train.sh scripts/train_coco.py [gpu_devices] [gpu_numbers] [master_port
 ## Evaluate MoRe
 ``` bash
 ### eval voc seg and LAM
-bash run_evaluate_voc.sh tools/infer_lam.py [gpu_device] [gpu_number] [infer_set] [checkpoint_path]
+bash run_evaluate_voc.sh [gpu_device] [gpu_number] [checkpoint_path]
 
 ### eval coco seg
 bash run_evaluate_seg_coco.sh tools/infer_seg_coco.py [gpu_device] [gpu_number] [infer_set] [checkpoint_path]
