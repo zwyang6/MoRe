@@ -4,7 +4,7 @@ import logging
 import os
 import random
 import sys
-sys.path.append("/data/PROJECTS/MoRe_2024/MoRe-main/")
+sys.path.append("/data/PROJECTS/MoRe_2024/MoRe/")
 import numpy as np
 import torch
 import torch.distributed as dist
