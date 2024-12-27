@@ -21,7 +21,7 @@ class network(nn.Module):
 
         self.classifier = nn.Conv2d(in_channels=self.in_channels[-1], out_channels=self.num_classes-1, kernel_size=1, bias=False,)
         self.aux_classifier = nn.Conv2d(in_channels=self.in_channels[-1], out_channels=self.num_classes-1, kernel_size=1, bias=False,)
-        self.graph_layer = graphic_cls_aggregation(topk=392,agg_type='bi-interaction')
+        self.graph_layer = graphic_cls_aggregation()
         
     def get_param_groups(self):
 
